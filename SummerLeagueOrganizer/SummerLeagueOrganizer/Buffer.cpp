@@ -6,9 +6,9 @@ inline void Buffer::lowerString(std::string& word) const {
 		word[x] = tolower(word[x]);
 }
 
-void Buffer::printTeam(std::ostream & out, const Category& category) const {
-	out << Category(category) << "Players:" << std::endl;
-	for (std::pair<std::string, Player>const & player : leagueTeams[U6])
+void Buffer::printTeam(std::ostream & out, const CATEGORY& category) const {
+	out << CATEGORY(category) << "Players:" << std::endl;
+	for (std::pair<std::string, Player>const & player : leagueTeams[category])
 		out << player.first << std::endl;
 }
 
@@ -26,7 +26,7 @@ void Buffer::clearSeason() {
 	}
 }
 
-Category Buffer::findAgeCategory(const int& age) const {
+CATEGORY Buffer::findAgeCategory(const int& age) const {
 	if (age >= 4 && age < 6)
 		return U6;
 	else if (age >= 6 && age < 8)
@@ -45,9 +45,9 @@ Category Buffer::findAgeCategory(const int& age) const {
 
 bool Buffer::insert_player(const std::string& name_, const int& year_of_birth_, const bool& reg_status_) {
 	int age = cur_year - year_of_birth_;
-	RegistrationStatus reg_status = reg_status_ ? PAID : NOT_PAID;
+	REG_STATUS reg_status = reg_status_ ? PAID : NOT_PAID;
 	// find the category of the player
-	Category playerCategory = findAgeCategory(age);
+	CATEGORY playerCategory = findAgeCategory(age);
 
 	if (playerCategory == ERR)
 		return false;
@@ -77,7 +77,7 @@ Player& Buffer::findPlayer(const std::string& name_) {
 bool Buffer::look_up_player(const std::string& name_) {
 	try {
 		Player player = findPlayer(name_);
-		std::cout << player << std::endl;
+		std::cout << std::endl << player;
 		return true;
 	}
 	catch (PlayerNotFoundException) {
@@ -90,7 +90,7 @@ bool Buffer::edit_player(const std::string& name_, const std::string& new_name) 
 		Player player = findPlayer(name_);// find the player's entry
 		Player playerToAdd(new_name, player.year_of_birth(), player.category(), player.reg_status());
 
-		Category category = player.category();
+		CATEGORY category = player.category();
 		leagueTeams[category].erase(name_);// erase the current entry
 
 		leagueTeams[category].insert(std::pair<std::string, Player>(new_name, playerToAdd));// add new entry
@@ -120,7 +120,7 @@ bool Buffer::edit_player(const std::string& name_, const int& new_year_of_birth)
 }
 
 
-bool Buffer::edit_player(const std::string& name_, const Category& new_category) {
+bool Buffer::edit_player(const std::string& name_, const CATEGORY& new_category) {
 	try {
 		findPlayer(name_).set_category(new_category);// find the player's entry and change it
 		return true;
@@ -132,7 +132,7 @@ bool Buffer::edit_player(const std::string& name_, const Category& new_category)
 
 bool Buffer::edit_player(const std::string& name_, const bool& new_reg_status) {
 	try {
-		RegistrationStatus reg_status = new_reg_status ? PAID : NOT_PAID;
+		REG_STATUS reg_status = new_reg_status ? PAID : NOT_PAID;
 		findPlayer(name_).set_reg_status(reg_status);// find the player's entry and change it
 		return true;
 	}
@@ -152,7 +152,7 @@ bool Buffer::deletePlayer(const std::string& name) {
 	return false;
 }
 
-void Buffer::displayStats()const {
+void Buffer::display_stats()const {
 	int numPlayers = 0;
 	int numPaid = 0;
 	std::vector<int> numUnpaid;
@@ -173,10 +173,10 @@ void Buffer::displayStats()const {
 		++teamCat;
 	}
 
-	std::cout << "\tNumber of player in league: " << numPlayers << std::endl
+	std::cout << std::endl << "\tNumber of player in league: " << numPlayers << std::endl
 		<< "\tNumber of players who have paid: " << numPaid << std::endl;
 	for (int team = U6; team < NUM_TEAMS; ++team) {
-		std::cout << "\tNumber of players who need to pay in " << Category(team) << ": " << numUnpaid[team] << std::endl;
+		std::cout << "\tNumber of players who need to pay in " << CATEGORY(team) << ": " << numUnpaid[team] << std::endl;
 	}
 }
 
@@ -211,7 +211,7 @@ bool Buffer::printToFile(std::string& category) const {
 	else if (category == "all") {
 		out.open("ALL.txt");
 		for (int team = U6; team < NUM_TEAMS; ++team) {
-			printTeam(out, Category(team));
+			printTeam(out, CATEGORY(team));
 			out << std::endl;
 		}
 	}

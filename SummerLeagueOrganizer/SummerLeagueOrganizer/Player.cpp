@@ -1,7 +1,7 @@
 #include "Player.h"
 #include<iostream>
 
-std::ostream & operator<<(std::ostream & out, Category category)
+std::ostream & operator<<(std::ostream & out, const CATEGORY& category)
 {
 	switch (category) {
 	case U6: {
