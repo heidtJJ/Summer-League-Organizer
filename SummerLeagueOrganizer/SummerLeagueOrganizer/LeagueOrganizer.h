@@ -3,11 +3,6 @@
 
 #include "Buffer.h"
 
-const static int MINIMUM_YEAR = 1900;
-const static std::string SHORT_SPACING(5, ' ');
-const static std::string SHORT_SEPERATOR(10, '-');
-const static std::string LONG_SEPERATOR(50, '-');
-
 class LeagueOrganizer {
 public:
 	void run();
@@ -20,15 +15,7 @@ private:
 
 	// executing commands methods for interface
 	void execute_command(const int& cmd, bool& done);
-	void execute_change_player(const int& cmd, const std::string& name);// first to do
-
-	// commands for each task
-	void add_player();
-	void edit_player();
-	void delete_player();
-	void write_to_file();
-	void search_for_player();
-	void start_new_season();
+	void execute_change_player(const int& cmd, const std::string& name);
 
 	// methods for getting data from user
 	bool get_player_paid();

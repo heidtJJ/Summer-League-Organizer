@@ -3,6 +3,13 @@
 #include <sstream>
 #include <string>
 
+
+const static int MINIMUM_YEAR = 1900;
+const static std::string SHORT_SPACING(5, ' ');
+const static std::string SHORT_SEPERATOR(10, '-');
+const static std::string LONG_SEPERATOR(50, '-');
+
+
 void LeagueOrganizer::run()
 {
 	get_current_year();
@@ -19,7 +26,7 @@ void LeagueOrganizer::run()
 		sstream >> choice;// extract data
 
 		if (!sstream.eof() || choice < 1 || choice > 8) {// error notify user
-			error_message_ = "Invalid input. Please enter a number for options 1 and 8.";
+			error_message_ = "Invalid input. Enter a number for options 1 through 8.";
 		}
 		if (error_message_.empty())
 			execute_command(choice, done);
@@ -27,6 +34,7 @@ void LeagueOrganizer::run()
 		std::cout << std::endl;
 	}
 }
+
 
 void LeagueOrganizer::display() {
 	std::cout << LONG_SEPERATOR << std::endl;
@@ -42,8 +50,9 @@ void LeagueOrganizer::display() {
 		<< SHORT_SPACING << "(7) Display statistics" << std::endl
 		<< SHORT_SPACING << "(8) Exit program - Note: Does not save." << std::endl;	std::cout << SHORT_SEPERATOR << std::endl;
 
-	std::cout << "Enter an number 1-7. Choice: ";
+	std::cout << "Enter a number 1-8. Choice: ";
 }
+
 
 void LeagueOrganizer::show_error_message() {
 	if (!error_message_.empty()) {
@@ -51,6 +60,7 @@ void LeagueOrganizer::show_error_message() {
 		error_message_.clear();
 	}
 }
+
 
 void LeagueOrganizer::give_options_change() const
 {
@@ -60,39 +70,120 @@ void LeagueOrganizer::give_options_change() const
 		<< SHORT_SPACING << "(3) Change registration status" << std::endl;
 }
 
+
 void LeagueOrganizer::execute_command(const int& cmd, bool& done) {
 	switch (cmd) {
-	case 1: {
-		start_new_season();
-		break;
+	case 1: {// start new season
+		std::cout << "Are you sure that you want to delete all current players?" << std::endl
+			<< "If yes, enter \"yes\". If no, enter anything other than \"yes\"." << std::endl;
+		std::string user_choice = "";
+		getline(std::cin, user_choice);
+		if (user_choice == "yes") {
+			league_buffer.clear_season();
+			std::cout << std::endl << "New season started. ";
+			get_current_year();
+		}
+		else {
+			std::cout << std::endl << "Season NOT cleared.";
+		}		break;
 	}
-	case 2: {
-		add_player();
-		break;
+	case 2: {// 
+		int year_of_birth;
+		std::string name = get_name_of_player();
+		if (error_message_.empty())
+			year_of_birth = get_year_of_birth();
+		bool player_paid;
+		if (error_message_.empty())
+			player_paid = get_player_paid();
+
+		if (error_message_.empty()) {
+			bool good_add = league_buffer.insert_player(name, current_year, year_of_birth, player_paid);
+			if (good_add) {
+				std::cout << std::endl << "Successfully added " + name + " into the league.";
+			}
+			else {
+				error_message_ = "Could not add player to the league. Player is already in league.";
+			}
+		}		break;
 	}
 	case 3: {
-		search_for_player();
+		std::string name = get_name_of_player();
+		bool playerFound = league_buffer.look_up_player(name);
+		if (!playerFound)
+			error_message_ = "Player is not found in the league.";
 		break;
 	}
 	case 4: {
-		edit_player();
-		break;
+		std::string name = get_name_of_player();
+
+		bool playerFound = league_buffer.look_up_player(name);
+		if (!playerFound)
+			error_message_ = "Player is not found in the league.";
+
+		if (error_message_.empty()) {
+			give_options_change();
+
+			std::string userChoice = "";
+			std::getline(std::cin, userChoice);
+			std::stringstream sstream(userChoice);
+
+			int choice;
+			sstream >> choice;// extract data from string stream
+
+			if (!sstream.eof() || choice < 1 || choice > 4) {// error notify user
+				error_message_ = "Invalid input. Number must be betweenr options 1 and 4.";
+			}
+			else {
+				execute_change_player(choice, name);
+			}
+		}		break;
 	}
 	case 5: {
-		delete_player();
-		break;
+		std::cout << "Deleting a player - ";
+		std::string player_name = get_name_of_player();
+
+		bool played_deleted = league_buffer.delete_player(player_name);
+		if (!played_deleted) {
+			std::cout << std::endl;
+			error_message_ = " Cannot delete player. Player was not found in the league.";
+		}
+		else {
+			std::cout << "Successfully deleted " + player_name + " from the league." << std::endl;
+		}		break;
 	}
 	case 6: {
-		write_to_file();
-		break;
+		std::cout << "If you would like to write the names of a single team to a file, enter \"U6\", \"U8\", \"U10\", etc." << std::endl;
+		std::cout << "If you would like to write the names of every team to a file, enter \"ALL\"." << std::endl;
+
+		std::string user_choice = "";
+		std::getline(std::cin, user_choice);
+		std::stringstream sstream(user_choice);
+
+		std::string choice;
+		sstream >> choice;// extract data from string stream
+
+		sstream.get();
+		if (!sstream) {
+			bool file_success = league_buffer.print_to_file(choice);
+			if (!file_success) {
+				error_message_ = "Invalid entry. File cannot be written to.";
+			}
+			else {
+				std::cout << "File successfully created.";
+			}
+		}
+		else {
+			error_message_ = "Invalid file selection. Cannot write to file.";
+		}		break;
 	}
 	case 7: {
 		league_buffer.display_stats();
 		break;
 	}
 	case 8: {
-		std::cout << "Are you sure that you want to end the program? Data will not be saved." << std::endl
+		std::cout << "Are you sure that you want to end the program? All unsaved data will be lost." << std::endl
 			<< "If yes, enter \"yes\". If no, enter anything other than \"yes\"." << std::endl;
+
 		std::string user_choice = "";
 		getline(std::cin, user_choice);
 		if (user_choice == "yes")
@@ -107,6 +198,7 @@ void LeagueOrganizer::execute_command(const int& cmd, bool& done) {
 	}
 	}
 }
+
 
 void LeagueOrganizer::execute_change_player(const int & cmd, const std::string& name)
 {
@@ -125,7 +217,7 @@ void LeagueOrganizer::execute_change_player(const int & cmd, const std::string& 
 		int new_birth_year = get_year_of_birth();
 
 		if (error_message_.empty()) {
-			league_buffer.edit_player(name, new_birth_year);
+			bool valid_year = league_buffer.edit_player(name,current_year ,new_birth_year);
 			std::cout << "Player successfully edited." << std::endl;
 		}
 		break;
@@ -146,123 +238,11 @@ void LeagueOrganizer::execute_change_player(const int & cmd, const std::string& 
 	}
 }
 
-void LeagueOrganizer::start_new_season()
-{
-	std::cout << "Are you sure that you want to delete all current players?" << std::endl
-		<< "If yes, enter \"yes\". If no, enter anything other than \"yes\"." << std::endl;
-	std::string user_choice = "";
-	getline(std::cin, user_choice);
-	if (user_choice == "yes") {
-		league_buffer.clearSeason();
-		std::cout << std::endl << "New season started.";
-	}
-	else {
-		std::cout << std::endl << "Season NOT cleared.";
-	}
-}
-
-void LeagueOrganizer::add_player()
-{
-	int year_of_birth;
-	std::string name = get_name_of_player();
-	if (error_message_.empty())
-		year_of_birth = get_year_of_birth();
-	bool player_paid;
-	if (error_message_.empty())
-		player_paid = get_player_paid();
-
-	if (error_message_.empty()) {
-		bool good_add = league_buffer.insert_player(name, year_of_birth, player_paid);
-		if (good_add) {
-			std::cout << std::endl << "Successfully added " + name + " into the league.";
-		}
-		else {
-			error_message_ = "Could not add player to the league. Player is already in league.";
-		}
-	}
-}
-
-void LeagueOrganizer::search_for_player()
-{
-	std::string name = get_name_of_player();
-	bool playerFound = league_buffer.look_up_player(name);
-	if (!playerFound)
-		error_message_ = "Player is not found in the league.";
-}
-
-void LeagueOrganizer::edit_player()
-{
-	std::string name = get_name_of_player();
-
-	bool playerFound = league_buffer.look_up_player(name);
-	if (!playerFound)
-		error_message_ = "Player is not found in the league.";
-
-	if (error_message_.empty()) {
-		give_options_change();
-
-		std::string userChoice = "";
-		std::getline(std::cin, userChoice);
-		std::stringstream sstream(userChoice);
-
-		int choice;
-		sstream >> choice;// extract data from string stream
-
-		if (!sstream.eof() || choice < 1 || choice > 4) {// error notify user
-			error_message_ = "Invalid input. Number must be betweenr options 1 and 4.";
-		}
-		else {
-			execute_change_player(choice, name);
-		}
-	}
-}
-
-void LeagueOrganizer::delete_player()
-{
-	std::cout << "Deleting a player - ";
-	std::string player_name = get_name_of_player();
-
-	bool played_deleted = league_buffer.deletePlayer(player_name);
-	if (!played_deleted) {
-		std::cout << std::endl;
-		error_message_ = " Cannot delete player. Player was not found in the league.";
-	}
-	else {
-		std::cout << "Successfully deleted " + player_name + " from the league." << std::endl;
-	}
-}
-
-void LeagueOrganizer::write_to_file()
-{
-	std::cout << "If you would like to write the names of a single team to a file, enter \"U6\", \"U8\", \"U10\", etc." << std::endl;
-	std::cout << "If you would like to write the names of every team to a file, enter \"ALL\"." << std::endl;
-
-	std::string user_choice = "";
-	std::getline(std::cin, user_choice);
-	std::stringstream sstream(user_choice);
-
-	std::string choice;
-	sstream >> choice;// extract data from string stream
-
-	sstream.get();
-	if (!sstream) {
-		bool file_success = league_buffer.printToFile(choice);
-		if (!file_success) {
-			error_message_ = "Invalid entry. File cannot be written to.";
-		}
-		else {
-			std::cout << "File successfully created.";
-		}
-	}
-	else {
-		error_message_ = "Invalid file selection. Cannot write to file.";
-	}
-}
 
 void LeagueOrganizer::get_current_year() {
 	bool good_year = false;
 	while (!good_year) {
-		std::cout << "Current year? ";
+		std::cout << "What is the current year? ";
 		std::string user_input = "";
 		getline(std::cin, user_input);
 
@@ -280,6 +260,7 @@ void LeagueOrganizer::get_current_year() {
 	}
 }
 
+
 int LeagueOrganizer::get_year_of_birth() {
 	int year_of_birth = -1;
 	std::cout << "Year of Birth? ";
@@ -296,6 +277,7 @@ int LeagueOrganizer::get_year_of_birth() {
 
 	return year_of_birth;
 }
+
 
 bool LeagueOrganizer::get_player_paid() {
 	char paid = ' ';
@@ -320,6 +302,7 @@ bool LeagueOrganizer::get_player_paid() {
 	}
 
 }
+
 
 std::string LeagueOrganizer::get_name_of_player() {
 	std::cout << "Name of player? ";

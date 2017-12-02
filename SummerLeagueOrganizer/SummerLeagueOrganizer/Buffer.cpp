@@ -1,27 +1,26 @@
 #include"Buffer.h"
 #include<fstream>
 
-inline void Buffer::lowerString(std::string& word) const {
+void Buffer::lower_string(std::string& word) const {
 	for (unsigned int x = 0; x < word.size(); ++x)
 		word[x] = tolower(word[x]);
 }
 
-void Buffer::printTeam(std::ostream & out, const CATEGORY& category) const {
+void Buffer::print_team(std::ostream & out, const CATEGORY& category) const {
 	out << CATEGORY(category) << "Players:" << std::endl;
-	for (std::pair<std::string, Player>const & player : leagueTeams[category])
+	for (std::pair<std::string, Player>const & player : league_teams[category])
 		out << player.first << std::endl;
 }
 
 Buffer::Buffer() {
 	for (int x = 0; x < NUM_TEAMS; ++x) {
 		std::map<std::string, Player> team;
-		leagueTeams.push_back(team);
+		league_teams.push_back(team);
 	}
-	cur_year = 2017;
 }
 
-void Buffer::clearSeason() {
-	for (std::map<std::string, Player>& team : leagueTeams) {
+void Buffer::clear_season() {
+	for (std::map<std::string, Player>& team : league_teams) {
 		team.clear();
 	}
 }
@@ -43,8 +42,8 @@ CATEGORY Buffer::findAgeCategory(const int& age) const {
 		return ERR;
 }
 
-bool Buffer::insert_player(const std::string& name_, const int& year_of_birth_, const bool& reg_status_) {
-	int age = cur_year - year_of_birth_;
+bool Buffer::insert_player(const std::string& name_, const int& current_year, const int& year_of_birth_,const bool& reg_status_) {
+	int age = current_year - year_of_birth_;
 	REG_STATUS reg_status = reg_status_ ? PAID : NOT_PAID;
 	// find the category of the player
 	CATEGORY playerCategory = findAgeCategory(age);
@@ -59,14 +58,14 @@ bool Buffer::insert_player(const std::string& name_, const int& year_of_birth_, 
 			return false;
 		}
 		catch (PlayerNotFoundException) {
-			leagueTeams[playerCategory].insert(std::pair<std::string, Player>(name_, playerToAdd));
+			league_teams[playerCategory].insert(std::pair<std::string, Player>(name_, playerToAdd));
 			return true;
 		}
 	}
 }
 
 Player& Buffer::findPlayer(const std::string& name_) {
-	for (std::map<std::string, Player>& team : leagueTeams) {
+	for (std::map<std::string, Player>& team : league_teams) {
 		auto it = team.find(name_);
 		if (it != team.end())
 			return it->second;
@@ -91,9 +90,9 @@ bool Buffer::edit_player(const std::string& name_, const std::string& new_name) 
 		Player playerToAdd(new_name, player.year_of_birth(), player.category(), player.reg_status());
 
 		CATEGORY category = player.category();
-		leagueTeams[category].erase(name_);// erase the current entry
+		league_teams[category].erase(name_);// erase the current entry
 
-		leagueTeams[category].insert(std::pair<std::string, Player>(new_name, playerToAdd));// add new entry
+		league_teams[category].insert(std::pair<std::string, Player>(new_name, playerToAdd));// add new entry
 		return true;
 	}
 	catch (PlayerNotFoundException) {
@@ -101,13 +100,13 @@ bool Buffer::edit_player(const std::string& name_, const std::string& new_name) 
 	}
 }
 
-bool Buffer::edit_player(const std::string& name_, const int& new_year_of_birth) {// could change category
+bool Buffer::edit_player(const std::string& name_, const int& current_year, const int& new_year_of_birth) {// could change category
 	try {
 		Player player = findPlayer(name_);
 		if (findAgeCategory(new_year_of_birth) != player.category()) {
-			deletePlayer(name_);
+			delete_player(name_);
 			bool paid = player.reg_status() == PAID ? true : false;
-			insert_player(player.name(), new_year_of_birth, paid);
+			insert_player(player.name(), current_year, new_year_of_birth, paid);
 		}
 		else {
 			findPlayer(name_).set_year_of_birth(new_year_of_birth);
@@ -141,11 +140,11 @@ bool Buffer::edit_player(const std::string& name_, const bool& new_reg_status) {
 	}
 }
 
-bool Buffer::deletePlayer(const std::string& name) {
-	for (std::map<std::string, Player>& team : leagueTeams) {
+bool Buffer::delete_player(const std::string& name) {
+	for (std::map<std::string, Player>& team : league_teams) {
 		auto it = team.find(name);
 		if (it != team.end()) {
-			leagueTeams[it->second.category()].erase(name);
+			league_teams[it->second.category()].erase(name);
 			return true;
 		}
 	}
@@ -158,7 +157,7 @@ void Buffer::display_stats()const {
 	std::vector<int> numUnpaid;
 
 	int teamCat = U6;
-	for (std::map<std::string, Player> const & team : leagueTeams) {
+	for (std::map<std::string, Player> const & team : league_teams) {
 		numUnpaid.push_back(0);
 		numPlayers += int(team.size());
 
@@ -180,38 +179,38 @@ void Buffer::display_stats()const {
 	}
 }
 
-bool Buffer::printToFile(std::string& category) const {
-	lowerString(category);
+bool Buffer::print_to_file(std::string& category) const {
+	lower_string(category);
 	std::ofstream out;
 	bool goodOpen = true;
 	if (category == "u6") {
 		out.open("U6.txt");
-		printTeam(out, U6);
+		print_team(out, U6);
 	}
 	else if (category == "u8") {
 		out.open("U8.txt");
-		printTeam(out, U8);
+		print_team(out, U8);
 	}
 	else if (category == "u10") {
 		out.open("U10.txt");
-		printTeam(out, U10);
+		print_team(out, U10);
 	}
 	else if (category == "u12") {
 		out.open("U12.txt");
-		printTeam(out, U12);
+		print_team(out, U12);
 	}
 	else if (category == "u14") {
 		out.open("U14.txt");
-		printTeam(out, U14);
+		print_team(out, U14);
 	}
 	else if (category == "u17") {
 		out.open("U17.txt");
-		printTeam(out, U17);
+		print_team(out, U17);
 	}
 	else if (category == "all") {
 		out.open("ALL.txt");
 		for (int team = U6; team < NUM_TEAMS; ++team) {
-			printTeam(out, CATEGORY(team));
+			print_team(out, CATEGORY(team));
 			out << std::endl;
 		}
 	}

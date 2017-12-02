@@ -1,0 +1,14 @@
+Starting new season (case from execute_command)
+
+            LeagueOrganizer     Buffer  Player
+                   |               |       |
+ get_name_of_player|               |       |
+  ---------------->|               |       |
+                   |look_up_player |       |
+                   |-------------->|       |
+                   |               |------>|
+                   |               |<------|
+                   |<--------------|       |
+    <--------------|               |       |
+
+
