@@ -1,3 +1,11 @@
+Below are commmon interactions between software commponents. 
+
+Note:
+  1) LeagueOrganizer is used for interacting with user and modifying its buffer
+  2) Buffer holds all the players in its data structure
+  3) Player offers << operators which easily allow buffer to write each player to a stream
+
+
 Finding a Player (case from execute_command)
 
             LeagueOrganizer     Buffer      Player
@@ -41,39 +49,25 @@ Start new season(case from execute_command)
 
 Write players to a file(case from execute_command)
 
-            LeagueOrganizer     Buffer      Player
-         run       |               |           |
-  ---------------->|               |           |
-  <----------------|               |           |
-  execute_command  |               |           |
-  <----------------|               |           |
-  ---------------->|               |           |
- get_name_of_player|               |           |
-  <----------------|               |           |
-  ---------------->|               |           |
-                   | print_to_file |           |
-                   |   print_team  |           |
-                   |-------------->|           |
-                   |               |operator <<|
-                   |               |---------->|
-                   |               |<----------|
-                   |<--------------|           |
-  <----------------|               |           |
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            LeagueOrganizer     Buffer       Player
+         run       |               |            |
+  ---------------->|               |            |
+  <----------------|               |            |
+  execute_command  |               |            |
+  <----------------|               |            |
+  ---------------->|               |            |
+ get_name_of_player|               |            |
+  <----------------|               |            |
+  ---------------->|               |            |
+                   | print_to_file |            |
+                   |-------------->|            |
+                   |               | print_team |
+                   |               | operator <<|
+                   |               |----------->|
+                   |               |<-----------|
+                   |               |     ...    |
+                   |<--------------|            |
+  <----------------|               |            |
 
 
 
