@@ -1,0 +1,219 @@
+Summer League Organizer
+Developer: Jared Heidt
+Version 1
+
+DESIGN DOCUMENT
+
+-----------------------------------------------------------------------------
+
+COMPONENT: class Player
+
+This class represents a player on a team. Each player has a name, year of birth, category, and registration status (see specification for details). The registration status and category are represented as an enumeration.
+
+Constant Enumeration CATEGORY { ERR = -1, U6, U8, U10, U12, U14, U17 }
+Constant Enumeration REG_STATUS { PAID, NOT_PAID }
+
+
+Public method:
+
+o const std::string& name() const
+
+    returns the name of the player  
+
+o const CATEGORY& category() const
+
+    returns the category of the player  
+    
+o const int& year_of_birth() const
+
+    returns the year of birth of the player  
+    
+o const REG_STATUS& reg_status() const
+
+    returns the registration status of the player  
+
+o void set_name(const std::string& name)
+
+    sets the registration status of the player  
+
+o void set_category(const CATEGORY& category)
+
+    sets the registration status of the player  
+
+o void set_reg_status(const REG_STATUS& reg_status)
+
+    sets the registration status of the player  
+
+o void set_year_of_birth(const int& year_of_birth)
+    
+    sets the registration status of the player  
+
+Friend declarations:
+
+o friend std::ostream& operator<<(std::ostream& out, const Player& player);
+   
+     prints player to the stream out by printing all its members
+
+o friend std::ostream& operator<<(std::ostream& out, const CATEGORY& category);
+     
+     prints the category to stream out in its string format (i.e. “U10”, “U10”)
+
+
+
+-----------------------------------------------------------------------------
+
+
+COMPONENT: class Buffer
+
+A buffer for a league organizer. The class organizes the teams of Players in the league. The class offers methods which allow another class to modify its data members.
+
+Important Implementation Details: Each team (U6, etc.) is structured as a map of players with the name of the player as the key, and a Player data structure (mentioned above) as the value. Because the team is a map, the names of the players are in order. 
+
+There are 5 teams, therefore, a vector of maps is used to organize the teams of players in the league. The vector has total 5 maps in its implementation. 
+
+Data member: vector<map<string, Player>> league_teams;
+
+To organize the vector, the CATEGORY enumeration in the Player class can be used on its indices (league_teams[U6], etc).
+
+
+Public methods:
+          
+o void clearSeason()
+
+     clears each map in the league_teams vector.
+o void display_stats() const
+     Displays the statistics of the league. See specification for details.
+o bool deletePlayer(const std::string& name_)
+     Deletes player with name name_ from the league. This method returns true if the player was successfully deleted from the data structure. The method returns false if the name was not found or could not be deleted.
+o bool printToFile(std::string& category) const 
+     Prints a team of the input category or all teams. Because the input is a string (“U6”, etc.), the method can parse the input and verify its category. If there are no matching categories to include “all”, the method returns false;
+o bool look_up_player(const std::string& name_)
+     This method searches for a player in the league_teams vector. If the player is not found, the method returns false. Else, the method returns true and ;
+
+o bool insert_player(const std::string& name_, const int& current_year, const int& year_of_birth_, const bool& reg_status_)
+     This method adds a player to the data structure. The player is given name_ and year_of_birth. If reg_status is true, the player has paid. If reg_status is false, the player has not paid. The category of the player is calculated with current_year and year_of_birth. The method returns true if the player is successfully added. The method returns false if there is a duplicate.
+
+o bool edit_player(const std::string& name_, const bool& new_reg_status)
+	This method searches for player in the league (on each of the teams) and changes the player if found. If the player is not found, the method returns false.
+o bool edit_player(const std::string& name_, const std::string& new_name) 
+	Same as above. A new Player object must be made to take create a new key.
+
+o bool edit_player(const std::string& name_, const CATEGORY& new_category);
+	
+Same as above. A new player object does not need to be created.
+
+o bool edit_player(const std::string& name_, const int& current_year, const int& new_year_of_birth);
+
+Same as above. A new player object needs to be created if age category changes.
+
+
+Private methods:
+ 
+o void lower_string(std::string& word) const
+
+	lowercases all the letters in a string
+
+o Player& findPlayer(const std::string& name_)
+
+	finds a player by iterating through each map (index in vector of maps) and returns it by reference. If player is not found, a PlayerNotFoundException is thrown.
+
+o CATEGORY findAgeCategory(const int& age) const
+
+	returns the category of the team which falls within the specified age of ranges. See specification for more details.
+
+o void printTeam(std::ostream& out, const CATEGORY& category) const
+	
+	prints the names of the members of a team to the stream out. See specification for details.
+
+
+-----------------------------------------------------------------------------
+
+
+COMPONENT: class LeagueOrganizer
+
+This component interfaces the buffer object and performs full error checking of the user. See specification for interface details. Each command from the user has a method which corresponds to a method in the buffer. This is so that the interface can interact with the user to needed information (and generate error messages).
+
+Public Methods:
+
+o void run()
+	
+This method runs the process of displaying options and interacting with the user. The method firsts asks for the current year, then starts the display and command execution. This loop continues until the users enters option 8 (exit program).
+
+
+Private Methods:
+
+o void display()
+	
+	This method shows the options available to the user. See specification for details.
+ 
+o void show_error_message()
+	
+	If existing, this method displays the error message on one line, then deletes it.
+
+o void give_options_change() const
+
+	This method displays the options for changing a player.
+
+o void execute_commmand(const int& cmd, bool& done)
+	
+	This method executes the command provided by the run() method. It sets done to true if the corresponding command is executed.
+
+Note: All of the following methods are used to handler each task in a 
+
+Case: start new season
+
+	This executes the “start a new season” option in the command interface. Before calling the corresponding method in the buffer, the method verifies that the user wants to start new season.
+
+Case: add a player
+
+	This case asks the user for the attributes of the player. It provides error checking, and inserts the player into the buffer if there are not errors. If there is an error, an error message is created.
+
+
+Case: search for player
+	
+	This case executes the look up player command from the interface. It provides an error message if the player is not found in the buffer.
+
+
+Case: delete a player
+
+	This method executes the delete player command from the interface. It provides error checking before deleting the player from the buffer.
+
+Case: write player names to a file
+	
+	This case executes the write to file command from the interface. It provides error checking before writing any teams to the file (with the buffer’s method).
+
+
+Case: display statistics
+
+	This case calls the corresponding method in the buffer to display statistics of the league.
+
+Case: Exit program
+
+	This program causes the program to end by setting (bool) done to true.
+
+
+
+o void execute_change_player(const int& cmd, const std::string& name)
+
+This method changes the player based on the command given by the edit_player() method. 
+
+
+o bool get_player_paid()
+
+	This method gets information from the user about whether a player has paid or not. The method returns true if the user has paid, false otherwise. If an error is given from the user, an error message is created.
+
+
+o int get_year_of_birth()
+
+	This method gets information from the user about a player’s year of birth. The method returns the age of the player. If an error is generated from the user while obtaining data, an error message is created.
+
+o void get_current_year()
+	
+	This method asks the user for the current year. The year is stored as a private data member of the class. This method provides error checking, but does not use the error_message_ private data member.
+
+
+
+o string get_name_of_player()
+
+	This method gets the name of a player from a user. The name is returned. If an error is generated, an error message is created.
+

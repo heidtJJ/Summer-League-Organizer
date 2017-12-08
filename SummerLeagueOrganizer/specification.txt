@@ -1,0 +1,86 @@
+Summer League Organizer
+Developer: Jared Heidt
+Version 1
+
+SPECIFICATION
+
+
+OVERVIEW -
+
+This project is to create a program that will help the local youth soccer association manage registrations to their summer league. The program prints a list of all the players from a specified team or all teams. 
+
+
+DETAILS -
+
+Each player entry in this file should consist of four lines: 
+
+name 
+year of birth 
+category 
+registration 
+status
+
+The possible categories are U6, U8, U10, U12, U14 and U17. The registration status is either paid or not paid.
+
+Categories: Ux stands for Under x. For example, U6 is for players that are younger than 6 years old and U8 is for players that are 6 or 7. Players younger than 4 or older than 16 cannot play in this summer league. If the user attempts to add such a player, the program should not do it and instead print an explanation.
+    
+Player ages: The age of a player is computed by subtracting the year of birth from the year that the user provided at the beginning of the season. 2 For example, if the year of the current season is 2017 and a player was born in 2005, we consider that the player is 12 years old.
+
+Error checking: When the user is asked to enter a year, the program must check that the user enters an integer and nothing else. Otherwise, the program should ask for the year again. The program must check that the file opens properly. If not, the program should print a message and quit that command. The program does not need to check that the file is properly formatted.
+
+
+
+The Interface -
+The program begins by asking the user for the current year. This is necessary for computing ages of players. Once the user gives a valid age, the program repetitively continues.
+
+The program next gives the user a list of options. Below is the specified list of options:
+(1) Start a new season
+(2) Add a player
+(3) Look up a player
+(4) Edit a player's information
+(5) Delete a player
+(6) Write player names to a file
+(7) Display statistics
+(8) Exit program - Note: Does not save.
+
+Sample Interface:
+---------------------------------------
+ERROR: Invalid input. Enter a number for options 1 through 8.
+Options:
+(1) Start a new season
+(2) Add a player
+(3) Look up a player
+(4) Edit a player's information
+(5) Delete a player
+(6) Write player names to a file
+(7) Display statistics
+(8) Exit program - Note: Does not save.
+----------
+Enter a number 1-7. Choice:
+
+The user must then select from the list of options. These options are described below:
+Start a new season. The user provides the current year and the program deletes all the existing players from the file. Before deleting, the program asks for a confirmation.
+
+2.	Add a player. The user provides the name, year of birth and registration status of a player and the program adds an entry to the file. The category is automatically computed.
+
+
+3.	Look up a player. The user provides a name and the program displays the entry for that player or a message saying that the player was not found.
+
+4.	Edit a player’s information. After searching for a player, the user is given the option of changing that player’s information (name, year of birth, registration status). If needed, the category of the player is recomputed automatically.
+Displayed options for changing a player:
+ 
+(1) Change name of player"
+(2) Change birth year of player
+(3) Change registration status
+
+5.	Delete a player. After searching for a player, the user is also given the option of deleting that player from the system. Before deleting, the program asks for a confirmation
+
+6.	Produce files with lists of players. The program asks the user for a category. The user is also given the option of specifying all categories. If the user specifies a category, the program produces a file with all the players in that category. The file is named after the category and with the extension txt. For example, U10.txt. If the user specifies all categories, the program produces a file named ALL.txt and one file for each category. In the file ALL.txt, all the players from all categories are listed. In all the files, the players appear in the format described above and they are listed in alphabetical order.
+
+
+7.	Display statistics. The number of players, the number who have paid and the number who haven’t paid, in total and for each category.
+
+8.	Exit program. Self-explanatory
+
+Error messages are generated with their respective cases (i.e. invalid input values).
+The program continues interacting with the user until the user quits. In other words, the same display is always shown after each command is executed.
