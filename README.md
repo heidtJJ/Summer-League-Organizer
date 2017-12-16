@@ -11,5 +11,5 @@ consist of four lines:
      registration status
 
 Please see [a link](Summer-League-Organizer/summer league organizer.pdf) for project details.
-Please see Summer-League-Organizer/SummerLeagueOrganizer/specification.txt for the software specification.
+Please see [a link](Summer-League-Organizer/SummerLeagueOrganizer/specification.txt) for the software specification.
 Please see Summer-League-Organizer/SummerLeagueOrganizer/design_doc.txt for the design document.
