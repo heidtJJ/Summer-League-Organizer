@@ -10,6 +10,8 @@ consist of four lines:
      category
      registration status
 
-Please see [a link](Summer-League-Organizer/summer league organizer.pdf) for project details.
-Please see [a link](Summer-League-Organizer/SummerLeagueOrganizer/specification.txt) for the software specification.
-Please see Summer-League-Organizer/SummerLeagueOrganizer/design_doc.txt for the design document.
+Please see [summer league organizer](Summer-League-Organizer/summer_league_organizer.pdf) for project details.
+
+Please see [specification](Summer-League-Organizer/SummerLeagueOrganizer/specification.txt) for the software specification.
+
+Please see [design document](Summer-League-Organizer/SummerLeagueOrganizer/design_doc.txt) for the design details.
